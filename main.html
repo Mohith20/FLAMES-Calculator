@@ -148,18 +148,32 @@ function check(name) {
 
 // Function to calculate FLAMES and display relationship status
 function calc() {
-    // Getting names from user input
-    var fname = document.getElementById('yname').value;
-    var sname = document.getElementById('pname').value;
+            var fname = document.getElementById('yname').value;
+            var sname = document.getElementById('pname').value;
 
-    // Store names in local storage
-    var previousNames = JSON.parse(localStorage.getItem('enteredNames')) || [];
-    previousNames.push({ boyName: fname, girlName: sname });
-    localStorage.setItem('enteredNames', JSON.stringify(previousNames));
+            fetch('http://localhost:3000/names', { // Update URL to your server endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ boyName: fname, girlName: sname })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to store names');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data); // Log success message to console
+                calculateFLAMES(); // Call the function to calculate FLAMES
+            })
+            .catch(error => {
+                console.error('Error storing names:', error);
+                // Handle error
+            });
+        }
 
-    // Calculate FLAMES and display relationship status
-    calculateFLAMES();
-}
 
 // Function to calculate FLAMES and display relationship status
 // Function to calculate FLAMES and display relationship status
