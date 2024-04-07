@@ -134,141 +134,103 @@ font-family: 'Permanent Marker', cursive;
 </div>
 <script>
 	
-//checking the user entered name-
-function check(name)
-{
-	var new_name = name.value;
+  var storedBoyName = ""; // Global variable to store boy's name
+var storedGirlName = ""; // Global variable to store girl's name
 
-            	if(!isNaN(new_name))
-            	{
-            		new_name = new_name.substring(0,(new_name.length-1));
-            		name.value = new_name;
-            	}
-}
-//calculating and validating the F L A M E S
-function calc()
-{
-	//getting names from user
-	var fname = document.getElementById('yname').value;
-	var sname = document.getElementById('pname').value;
-	//alert if button is pressed without entering the names
-	if (fname=='') {
-		alert("Enter First Name");
-	}
-	else if (sname=='') {
-		alert("Enter Second Name");
-	}
-
-    var r = /\s+/g;
-    var orfirst = document.first.name.value.toUpperCase();
-    var nam=orfirst;
-    orfirst = orfirst.replace(r,"");
-    if(orfirst!="")
-    {
-			var count = 0;
-            var first = orfirst;
-            second = eval("document.first.name"+1).value.toUpperCase();
-            var names=second;
-            second = second.replace(r,"");
-            if(second != "")
-            {
-                document.getElementById("result").style.display = 'block';
-                    for(var i=0; i<first.length; i++)
-                    {
-                            for(var j=0; j<second.length; j++)
-                            {
-                                    if(first[i] == second[j])
-                                    {
-                                            var a1 = first.substring(0,i);
-                                            var a2 = first.substring(i+1,first.length);
-                                            first = a1+a2;
-                                            i=-1;
-                                            var b1 = second.substring(0,j);
-                                            var b2 = second.substring(j+1,second.length);
-                                            second = b1+b2;
-                                            j=-1;
-                                            break;
-                                    }
-                            }
-                    }
-
-                    var ss=(first+second);
-                    var l=ss.length;
-                    var ar = new Array("F", "L", "A", "M", "E", "S");
-                    var stp=1;
-
-                    for(var x=6; x>1; x--)
-                    {
-                            var g=((l%x)+stp)-1;
-                            if(g>x)
-                            {
-                                    g=g%x;
-                            }
-                            if(g==0)
-                            {
-                                    g=ar.length;
-                            }
-                            ar.splice(g-1,1);
-                            stp=g;
-                            //alert(ar);
-                    }
-
-                    if(ar=="F")
-                    {
-                            //res="FRIENDS";
-							document.getElementById("display_flame").innerHTML = 'FRIENDS';
-							document.getElementById("display_flame").style.color='blue';
-                    }
-                    else if(ar=="L")
-                    {
-                            //res="LOVER";
-							document.getElementById("display_flame").innerHTML = 'LOVER';
-							document.getElementById("display_flame").style.color='#FF0080';
-                    }
-                    else if(ar=="A")
-                    {
-                            //res="AFFECTION";
-							document.getElementById("display_flame").innerHTML = 'AFFECTION';
-							document.getElementById("display_flame").style.color='#DBA901';
-                    }
-                    else if(ar=="M")
-                    {
-                            //res="MARRIAGE";
-							document.getElementById("display_flame").innerHTML = 'MARRIAGE';
-							document.getElementById("display_flame").style.color='green';
-                    }
-                    else if(ar=="E")
-                    {
-                            //res="ENEMY";
-							document.getElementById("display_flame").innerHTML = 'ENEMY';
-							document.getElementById("display_flame").style.color='red';
-                    }
-                    else if(ar=="S")
-                    {
-                            //res="SISTER";
-							document.getElementById("display_flame").innerHTML = 'SISTER';
-							document.getElementById("display_flame").style.color='violet';
-                    }
-                    document.getElementById("nam"+1).style.display = 'block';
-                    document.getElementById("nam"+1).textContent= "Relationship status of " +nam + " & " +names+ " is :";
-            }
-            else
-            {
-                    document.getElementById("nam"+1).style.display = 'none';
-                    count++;
-                    if(count==4)
-                    {
-                            alert("Enter other name");
-                            document.getElementById("result").style.display = 'block';
-                    }
-            }
-    }
-    else
-    {
-            return false;
+// Function to check user input for name
+function check(name) {
+    var new_name = name.value;
+    if (!isNaN(new_name)) {
+        new_name = new_name.substring(0, (new_name.length - 1));
+        name.value = new_name;
     }
 }
 
+// Function to calculate FLAMES and display relationship status
+function calc() {
+    // Getting names from user input
+    var fname = document.getElementById('yname').value;
+    var sname = document.getElementById('pname').value;
+
+    // Store names in local storage
+    var previousNames = JSON.parse(localStorage.getItem('enteredNames')) || [];
+    previousNames.push({ boyName: fname, girlName: sname });
+    localStorage.setItem('enteredNames', JSON.stringify(previousNames));
+
+    // Calculate FLAMES and display relationship status
+    calculateFLAMES();
+}
+
+// Function to calculate FLAMES and display relationship status
+// Function to calculate FLAMES and display relationship status
+function calculateFLAMES() {
+    var result = ""; // Variable to store relationship status
+
+    // Getting names from user input
+    var fname = document.getElementById('yname').value.toUpperCase();
+    var sname = document.getElementById('pname').value.toUpperCase();
+
+    // Remove spaces from names
+    fname = fname.replace(/\s/g, "");
+    sname = sname.replace(/\s/g, "");
+
+    // Calculate common letters
+    var commonLetters = "";
+    for (var i = 0; i < fname.length; i++) {
+        var char = fname.charAt(i);
+        if (sname.indexOf(char) !== -1) {
+            commonLetters += char;
+            sname = sname.replace(char, "");
+        }
+    }
+
+    // Determine relationship status based on the length of commonLetters
+    var totalLength = fname.length + sname.length;
+    var remainingLetters = totalLength - (2 * commonLetters.length);
+    var statusIndex = remainingLetters % 6; // 6 statuses: FRIENDS, LOVER, AFFECTION, MARRIAGE, ENEMY, SISTER
+    var statuses = ["FRIENDS", "LOVER", "AFFECTION", "MARRIAGE", "ENEMY", "SISTER"];
+    result = statuses[statusIndex];
+
+    // Display relationship status
+    document.getElementById("display_flame").innerHTML = result;
+    document.getElementById("display_flame").style.color = getStatusColor(result); // Function to get color based on status
+
+    // Display names on the webpage
+    document.getElementById("nam1").style.display = 'block';
+    document.getElementById("nam1").textContent = "Relationship status of " + fname + " & " + sname + " is : " + result;
+}
+
+
+// Function to get color based on relationship status
+function getStatusColor(status) {
+    switch (status) {
+        case "FRIENDS":
+            return 'blue';
+        case "LOVER":
+            return '#FF0080';
+        case "AFFECTION":
+            return '#DBA901';
+        case "MARRIAGE":
+            return 'green';
+        case "ENEMY":
+            return 'red';
+        case "SISTER":
+            return 'violet';
+        default:
+            return 'black'; // Default color
+    }
+}
+function retrieveEnteredNames() {
+    var enteredNames = JSON.parse(localStorage.getItem('enteredNames')) || [];
+    return enteredNames;
+}
+var allEnteredNames = retrieveEnteredNames();
+
+// Log all entered names to console
+console.log("All Entered Names:");
+allEnteredNames.forEach(function(entry, index) {
+    console.log("Entry " + (index + 1) + ": Boy's Name - " + entry.boyName + ", Girl's Name - " + entry.girlName);
+});
 </script>
 </body> 
  </html>
